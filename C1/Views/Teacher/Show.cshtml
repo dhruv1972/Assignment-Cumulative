@@ -1,0 +1,55 @@
+﻿@model Cumulative1.Models.Teacher
+
+@{
+    ViewBag.Title = "Teacher Details";
+}
+
+<div id="containerShow" class="container">
+    <nav class="my-3">
+        <a class="navlink" href="/Teacher/List">Back To Teachers List</a>
+    </nav>
+
+    <h2>Teacher Information</h2>
+
+    @if (Model == null)
+    {
+        <div class="alert alert-danger">Teacher details not found.</div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <strong>ID:</strong> @Model.TeacherId
+        </div>
+        <div class="mb-3">
+            <strong>Employee Number:</strong> @Model.EmployeeNumber
+        </div>
+        <div class="mb-3">
+            <strong>Full Name:</strong> @Model.TeacherFname @Model.TeacherLname
+        </div>
+        <div class="mb-3">
+            <strong>Hire Date:</strong> @Model.HireDate.ToString("MM/dd/yyyy")
+        </div>
+        <div class="mb-3">
+            <strong>Salary:</strong> @Model.Salary.ToString("C")
+        </div>
+
+        <h3>Assigned Classes</h3>
+        <div class="mb-3">
+            @if (Model.Classes != null)
+            {
+                <ul>
+                    @foreach (var _class in Model.Classes)
+                    {
+                        <li><a href="/Class/Show/@_class.ClassId">@_class.ClassCode</a> - @_class.ClassName</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No classes assigned.</p>
+            }
+        </div>
+
+        
+    }
+</div>
