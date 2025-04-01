@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Cumulative1.Models;
 using System.Diagnostics;
 using System.Web.Http;
+using System.Web.Http.Cors;
+
 
 
 namespace Cumulative1.Controllers
@@ -18,7 +20,7 @@ namespace Cumulative1.Controllers
         /// <param name="SearchKey">Optional search key to filter teachers by first name, last name, full name, hire date, or salary.</param>
         /// <returns>
         /// A list of teacher objects.
-       
+
         [HttpGet]
         [Route("api/TeacherData/ListTeachers/{SearchKey?}")]
         public IEnumerable<Teacher> ListTeachers(string SearchKey = null)
@@ -94,6 +96,121 @@ namespace Cumulative1.Controllers
                 Conn.Close();
             }
             return NewTeacher;
+
+        }
+        /// <summary>
+        /// Adds a teacher to the MySQL Database.
+        /// </summary>
+        /// <param name="NewTeacher">An object with fields that map to the columns of the teacher's table.</param>
+        /// <returns>
+        /// A response indicating the success or failure of the operation.
+        /// Returns a 400 Bad Request response if the provided information is missing or incorrect.
+        /// Returns a 200 OK response if the teacher is added successfully.
+        /// </returns>
+        /// <example>
+        /// POST api/TeacherData/AddTeacher 
+        /// FORM DATA / POST DATA / REQUEST BODY 
+        /// {
+        ///	"TeacherFname":"Dhruv",
+        ///	"TeacherLname":"Chavda",
+        ///	"EmployeeNumber":"T1234",
+        ///	"HireDate":"04-01-2025"
+        ///	"Salary": 65
+        /// }
+        /// </example>
+        [HttpPost]
+        [EnableCors(origins: "*", methods: "*", headers: "*")]
+        [Route("api/TeacherData/AddTeacher")]
+        public IHttpActionResult AddTeacher([FromBody] Teacher NewTeacher)
+        {
+
+            if (string.IsNullOrEmpty(NewTeacher.TeacherFname) || string.IsNullOrEmpty(NewTeacher.TeacherLname) ||
+                string.IsNullOrEmpty(NewTeacher.EmployeeNumber) || NewTeacher.HireDate == null || NewTeacher.HireDate > DateTime.Now || NewTeacher.Salary < 0)
+            {
+                // Return a 400 Bad Request response with an error message
+                return BadRequest("Invalid data provided for adding the teacher.");
+            }
+
+            //Create an instance of a connection
+            MySqlConnection Conn = School.AccessDatabase();
+
+            //Open the connection between the web server and database
+            Conn.Open();
+
+            //Establish a new command (query) for our database
+            MySqlCommand cmd = Conn.CreateCommand();
+
+            //SQL QUERY
+            cmd.CommandText = "insert into teachers (teacherfname, teacherlname, employeenumber, hiredate, salary) values (@TeacherFname,@TeacherLname,@Employeenumber, @HireDate, @Salary)";
+            cmd.Parameters.AddWithValue("@TeacherFname", NewTeacher.TeacherFname);
+            cmd.Parameters.AddWithValue("@TeacherLname", NewTeacher.TeacherLname);
+            cmd.Parameters.AddWithValue("@EmployeeNumber", NewTeacher.EmployeeNumber);
+            cmd.Parameters.AddWithValue("@HireDate", NewTeacher.HireDate);
+            cmd.Parameters.AddWithValue("@Salary", NewTeacher.Salary);
+
+            cmd.Prepare();
+
+            cmd.ExecuteNonQuery();
+
+            Conn.Close();
+            return Ok("Teacher added successfully");
+        }
+
+        /// <summary>
+        /// Deletes a teacher from the connected MySQL Database if the ID of that teacher exists.
+        /// </summary>
+        /// <param name="id">The ID of the teacher.</param>
+        /// <returns>
+        /// A response indicating the success of the operation..
+        /// Returns a 200 OK response if the teacher is updated successfully.
+        /// </returns>
+        /// <example>POST /api/TeacherData/DeleteTeacher/3</example>
+        [HttpPost]
+        [EnableCors(origins: "*", methods: "*", headers: "*")]
+        [Route("api/TeacherData/DeleteTeacher/{id}")]
+        public IHttpActionResult DeleteTeacher(int id)
+        {
+            //Create an instance of a connection
+            MySqlConnection Conn = School.AccessDatabase();
+
+            //Open the connection between the web server and database
+            Conn.Open();
+
+            //Establish a new command (query) for our database
+            MySqlCommand cmd = Conn.CreateCommand();
+
+            // SQL QUERY
+            // Delete from teachers table where teacherid = @id
+            cmd.CommandText = "DELETE FROM teachers WHERE teacherid = @id";
+            cmd.Parameters.AddWithValue("@id", id);
+
+            try
+            {
+                int rowsAffected = cmd.ExecuteNonQuery();
+                Conn.Close();
+
+                if (rowsAffected > 0)
+                {
+                    return Ok("Teacher Deleted successfully");
+                }
+                else
+                {
+                    return NotFound(); // Or another appropriate response if the teacher wasn't found
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Debug.WriteLine("Error deleting teacher: " + ex.Message);
+                return InternalServerError(); // Or handle the error in a more specific way
+            }
+            finally
+            {
+                if (Conn.State == System.Data.ConnectionState.Open)
+                {
+                    Conn.Close();
+                }
+            }
         }
     }
 }
+    
