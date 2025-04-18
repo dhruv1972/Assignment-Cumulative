@@ -156,5 +156,85 @@ namespace Cumulative1.Controllers
             // Return a 200 OK response
             return new HttpStatusCodeResult(HttpStatusCode.OK);
         }
+        /// <summary>
+        /// Routes to a dynamically generated "Teacher Update" Page. Gathers information from the database.
+        /// </summary>
+        /// <param name="id">Id of the Teacher</param>
+        /// <returns>A dynamic "Update Teacher" webpage which provides the current information of the teacher and asks the user for new information as part of a form.</returns>
+        /// <example>
+        /// Example of GET request:
+        /// GET /Teacher/Update/123
+        /// </example>
+        public ActionResult Update(int id)
+        {
+            TeacherDataController controller = new TeacherDataController();
+            Teacher SelectedTeacher = controller.FindTeacher(id);
+
+            return View(SelectedTeacher);
+        }
+
+        /// <summary>
+        /// Routes to a dynamically generated "Teacher Update" Page. 
+        /// </summary>
+        /// <param name="id">Id of the Teacher</param>
+        /// <returns>A dynamic "Update Teacher" webpage </returns>
+        /// <example>
+        /// Example of GET request:
+        /// GET /Teacher/Ajax_Update/123
+        /// </example>
+        public ActionResult Ajax_Update(int id)
+        {
+            TeacherDataController controller = new TeacherDataController();
+            Teacher SelectedTeacher = controller.FindTeacher(id);
+
+            return View(SelectedTeacher);
+        }
+
+        /// <summary>
+        /// Updates the information of a specific teacher in the system.
+        /// </summary>
+        /// <param name="id">The ID of the teacher to update.</param>
+        /// <param name="TeacherFname">The updated first name of the teacher.</param>
+        /// <param name="TeacherLname">The updated last name of the teacher.</param>
+        /// <param name="EmployeeNumber">The updated employee number of the teacher.</param>
+        /// <param name="HireDate">The updated hire date of the teacher.</param>
+        /// <param name="Salary">The updated salary of the teacher.</param>
+        /// <returns>
+        /// Returns the "Update Teacher" view with an error message if the provided information is missing or incorrect.
+        /// </returns>
+        /// <example>
+        /// Example of POST request body:
+        /// POST /Teacher/Update/{id}
+        /// {
+        ///     "TeacherFname": "UpdatedFirstName",
+        ///     "TeacherLname": "UpdatedLastName",
+        ///     "EmployeeNumber": "UpdatedEmployeeNumber",
+        ///     "HireDate": "2024-04-20",
+        ///     "Salary": 70
+        /// }
+        /// </example>
+        [HttpPost]
+        public ActionResult Update(int id, string TeacherFname, string TeacherLname, string EmployeeNumber, DateTime HireDate, decimal? Salary)
+        {
+            TeacherDataController controller = new TeacherDataController();
+            if (string.IsNullOrEmpty(TeacherFname) || string.IsNullOrEmpty(TeacherLname) ||
+    string.IsNullOrEmpty(EmployeeNumber) || HireDate == null || HireDate > DateTime.Now || Salary == null || Salary < 0)
+            {
+                // Return the view with an error message
+                ViewBag.Message = "Missing or incorrect information when updating a teacher";
+                Teacher SelectedTeacher = controller.FindTeacher(id);
+                return View("Update", SelectedTeacher);
+            }
+            Teacher TeacherInfo = new Teacher();
+            TeacherInfo.TeacherFname = TeacherFname;
+            TeacherInfo.TeacherLname = TeacherLname;
+            TeacherInfo.EmployeeNumber = EmployeeNumber;
+            TeacherInfo.HireDate = HireDate;
+            TeacherInfo.Salary = Salary ?? 0;
+
+            controller.UpdateTeacher(id, TeacherInfo);
+
+            return RedirectToAction("Show/" + id);
+        }
     }
 }

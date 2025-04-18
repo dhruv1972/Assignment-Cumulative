@@ -165,7 +165,7 @@ namespace Cumulative1.Controllers
         /// Returns a 200 OK response if the teacher is updated successfully.
         /// </returns>
         /// <example>POST /api/TeacherData/DeleteTeacher/3</example>
-        [HttpPost]
+        [HttpDelete]
         [EnableCors(origins: "*", methods: "*", headers: "*")]
         [Route("api/TeacherData/DeleteTeacher/{id}")]
         public IHttpActionResult DeleteTeacher(int id)
@@ -211,6 +211,73 @@ namespace Cumulative1.Controllers
                 }
             }
         }
+        /// <summary>
+        /// Updates the information of a specific teacher in the MySQL Database.
+        /// </summary>
+        /// <param name="id">The ID of the teacher to update.</param>
+        /// <param name="TeacherInfo">An object containing the updated information of the teacher.</param>
+        /// <returns>
+        /// Returns a 400 Bad Request response if the provided information is missing or incorrect.
+        /// Returns a 200 OK response if the teacher is updated successfully.
+        /// </returns>
+        /// <example>
+        /// Example of POST request body:
+        /// POST /api/TeacherData/UpdateTeacher/{id}
+        /// {
+        ///     "TeacherFname": "UpdatedFirstName",
+        ///     "TeacherLname": "UpdatedLastName",
+        ///     "EmployeeNumber": "UpdatedEmployeeNumber",
+        ///     "HireDate": "2024-04-20",
+        ///     "Salary": 70
+        /// }
+        /// </example>
+        [HttpPost]
+        [EnableCors(origins: "*", methods: "*", headers: "*")]
+        [Route("api/TeacherData/UpdateTeacher/{id}")]
+        public IHttpActionResult UpdateTeacher(int id, [FromBody] Teacher TeacherInfo)
+        {
+            if (string.IsNullOrEmpty(TeacherInfo.TeacherFname) || string.IsNullOrEmpty(TeacherInfo.TeacherLname) ||
+                string.IsNullOrEmpty(TeacherInfo.EmployeeNumber) || TeacherInfo.HireDate == null || TeacherInfo.HireDate > DateTime.Now || TeacherInfo.Salary < 0)
+            {
+                // Return a 400 Bad Request response with an error message
+                return BadRequest("Invalid data provided for updating the teacher.");
+            }
+
+            //Create an instance of a connection
+            MySqlConnection Conn = School.AccessDatabase();
+
+            //Debug.WriteLine("id: " + id);
+            //Debug.WriteLine("TeacherFname: " + TeacherInfo.TeacherFname);
+            //Debug.WriteLine("TeacherLname: " + TeacherInfo.TeacherLname);
+            //Debug.WriteLine("EmployeeNumber: " + TeacherInfo.EmployeeNumber);
+            //Debug.WriteLine("HireDate: " + TeacherInfo.HireDate);
+            //Debug.WriteLine("Salary: " + TeacherInfo.Salary);
+
+
+            //Open the connection between the web server and database
+            Conn.Open();
+
+            //Establish a new command (query) for our database
+            MySqlCommand cmd = Conn.CreateCommand();
+
+            //SQL QUERY
+            cmd.CommandText = "UPDATE teachers SET teacherfname=@TeacherFname, teacherlname=@TeacherLname, employeenumber=@EmployeeNumber, hiredate=@HireDate, salary=@Salary  where teacherid=@TeacherId";
+            cmd.Parameters.AddWithValue("@TeacherFname", TeacherInfo.TeacherFname);
+            cmd.Parameters.AddWithValue("@TeacherLname", TeacherInfo.TeacherLname);
+            cmd.Parameters.AddWithValue("@EmployeeNumber", TeacherInfo.EmployeeNumber);
+            cmd.Parameters.AddWithValue("@HireDate", TeacherInfo.HireDate);
+            cmd.Parameters.AddWithValue("@Salary", TeacherInfo.Salary);
+            cmd.Parameters.AddWithValue("@TeacherId", id);
+            cmd.Prepare();
+
+            cmd.ExecuteNonQuery();
+
+            Conn.Close();
+
+            return Ok("Teacher updated successfully");
+        }
+
     }
 }
+    
     
