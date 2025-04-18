@@ -29,9 +29,8 @@ This project is a simple web application for managing teacher information, built
     git clone <repository_url>
     cd <repository_directory>
     ```
-    (Replace `<repository_url>` and `<repository_directory>` with your project's information)
-
-3.  **Database Setup:**
+   
+   3.  **Database Setup:**
     * **Create a Database:** Create a new database named `school` (or your preferred name, but update the connection string accordingly) in your MySQL server.
     * **Create the `teachers` Table:** Execute the following SQL script to create the `teachers` table:
         ```sql
