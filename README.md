@@ -94,5 +94,5 @@ curl -X POST -H "Content-Type: application/json" -d '{
 # Delete teacher with ID 3
 curl -X POST http://localhost:<your_port>/api/TeacherData/DeleteTeacher/3
 
-# Update teacher with ID 10 (example with JSON data)
+# Update teacher with ID 1 
 curl -X POST -H "Content-Type: application/json" -d '{ "TeacherFname": "UpdatedFirstName", "TeacherLname": "UpdatedLastName", "EmployeeNumber": "UpdatedEmployeeNumber", "HireDate": "2024-04-17", "Salary": 70 }' http://localhost:<your_port>/api/TeacherData/UpdateTeacher/1
