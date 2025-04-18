@@ -71,9 +71,10 @@ The application exposes the following API endpoints (primarily used internally b
     * Adds a new teacher. Expects teacher data in the request body (as JSON or form data).
 * **`POST /api/TeacherData/DeleteTeacher/{id}`**
     * Deletes the teacher with the specified `id`.
-*`POST /api/TeacherData/UpdateTeacher/{id}`: Updates the information of the teacher with the specified `id`. Expects updated teacher data in the request body (as JSON or form data).
-
-You can test these API endpoints using tools like `curl` or Postman. Example `curl` commands:
+* **`POST /api/TeacherData/UpdateTeacher/{id}`: .**
+    Updates the information of the teacher with the specified `id`.
+  
+* **You can test these API endpoints using tools like `curl` or Postman. Example `curl` commands:**
 
 ```bash
 # List all teachers
