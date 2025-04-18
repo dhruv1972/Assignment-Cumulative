@@ -8,6 +8,7 @@ This project is a simple web application for managing teacher information, built
 * **Show Teacher Details:** Displays detailed information for a specific teacher, including their ID, employee number, full name, hire date, and salary.
 * **Add Teacher:** Adds a new teacher to the database via a POST request. Supports both traditional form submission and AJAX.
 * **Delete Teacher:** Deletes an existing teacher from the database based on their ID via a POST request (now supports AJAX).
+* **Update Teacher:** Allows users to modify the information of an existing teacher via a POST request. Supports traditional form submission and AJAX.
 
 ## Technologies Used
 
@@ -70,6 +71,7 @@ The application exposes the following API endpoints (primarily used internally b
     * Adds a new teacher. Expects teacher data in the request body (as JSON or form data).
 * **`POST /api/TeacherData/DeleteTeacher/{id}`**
     * Deletes the teacher with the specified `id`.
+*`POST /api/TeacherData/UpdateTeacher/{id}`: Updates the information of the teacher with the specified `id`. Expects updated teacher data in the request body (as JSON or form data).
 
 You can test these API endpoints using tools like `curl` or Postman. Example `curl` commands:
 
@@ -91,3 +93,6 @@ curl -X POST -H "Content-Type: application/json" -d '{
 
 # Delete teacher with ID 3
 curl -X POST http://localhost:<your_port>/api/TeacherData/DeleteTeacher/3
+
+# Update teacher with ID 10 (example with JSON data)
+curl -X POST -H "Content-Type: application/json" -d '{ "TeacherFname": "UpdatedFirstName", "TeacherLname": "UpdatedLastName", "EmployeeNumber": "UpdatedEmployeeNumber", "HireDate": "2024-04-17", "Salary": 70 }' http://localhost:<your_port>/api/TeacherData/UpdateTeacher/1
